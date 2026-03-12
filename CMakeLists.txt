@@ -2,14 +2,6 @@ cmake_minimum_required(VERSION 3.20)
 
 project(CViewer VERSION 0.1.0 LANGUAGES C CXX)
 
-set(
-    CMAKE_POLICY_VERSION_MINIMUM
-    3.5
-    CACHE STRING
-    "Policy baseline for legacy third-party CMake projects on CMake 4+."
-    FORCE
-)
-
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
@@ -22,20 +14,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(OpenGL REQUIRED)
 
-include(FetchContent)
+include(cmake/GlfwExternal.cmake)
 include(cmake/OpenSceneGraphExternal.cmake)
 
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(
-    glfw
-    GIT_REPOSITORY https://gitee.com/mirrors/glfw.git
-    GIT_TAG master
+cviewer_configure_glfw(
+    CVIEWER_GLFW_TARGET
+    CVIEWER_GLFW_DEPENDENCY_TARGET
 )
-FetchContent_MakeAvailable(glfw)
 
 cviewer_configure_openscenegraph(
     CVIEWER_OSG_TARGET
@@ -53,15 +38,13 @@ file(
 
 if(CVIEWER_SOURCES)
     add_executable(${PROJECT_NAME} ${CVIEWER_SOURCES})
-    # OSG provides headers in source/include and generates osg/Config, osg/Version in binary/include.
     target_include_directories(
         ${PROJECT_NAME}
         PRIVATE
             include
-            ${glfw_SOURCE_DIR}/deps
     )
-    target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL ${CVIEWER_OSG_TARGET})
-    add_dependencies(${PROJECT_NAME} ${CVIEWER_OSG_DEPENDENCY_TARGET})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${CVIEWER_GLFW_TARGET} OpenGL::GL ${CVIEWER_OSG_TARGET})
+    add_dependencies(${PROJECT_NAME} ${CVIEWER_GLFW_DEPENDENCY_TARGET} ${CVIEWER_OSG_DEPENDENCY_TARGET})
 
     set(CVIEWER_SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/shader")
     if(EXISTS "${CVIEWER_SHADER_SOURCE_DIR}")
