@@ -38,8 +38,10 @@ FetchContent_MakeAvailable(glfw)
 
 set(BUILD_OSG_APPLICATIONS OFF CACHE BOOL "" FORCE)
 set(BUILD_OSG_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BUILD_OSG_PLUGINS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
+set(BUILD_OSG_PLUGINS_BY_DEFAULT ON CACHE BOOL "" FORCE)
 set(BUILD_DOCUMENTATION OFF CACHE BOOL "" FORCE)
+set(BUILD_OSG_PLUGIN_CFG OFF CACHE BOOL "" FORCE)
+set(BUILD_OSG_PLUGIN_OBJ OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     openscenegraph
@@ -68,13 +70,28 @@ file(
 
 if(CVIEWER_SOURCES)
     add_executable(${PROJECT_NAME} ${CVIEWER_SOURCES})
-    # OSG generates osg/Version into its binary include directory.
+    # OSG provides headers in source/include and generates osg/Config, osg/Version in binary/include.
     target_include_directories(
         ${PROJECT_NAME}
         PRIVATE
             include
+            ${openscenegraph_BINARY_DIR}/include
+            ${GLFW_SOURCE_DIR}/deps
     )
     target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL ${CVIEWER_OSG_TARGET})
+
+    set(CVIEWER_SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/shader")
+    if(EXISTS "${CVIEWER_SHADER_SOURCE_DIR}")
+        add_custom_command(
+            TARGET ${PROJECT_NAME}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${PROJECT_NAME}>/shader"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${CVIEWER_SHADER_SOURCE_DIR}"
+                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/shader"
+            COMMENT "Copying shader directory to output bin folder"
+        )
+    endif()
 else()
     message(STATUS "No source files found in src/. Add code under src/ to build ${PROJECT_NAME}.")
 endif()
