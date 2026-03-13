@@ -15,7 +15,7 @@ function(cviewer_configure_openscenegraph out_interface_target out_dependency_ta
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5
             -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
             -DCMAKE_C_STANDARD:STRING=${CMAKE_C_STANDARD}
-            -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+            -DCMAKE_CXX_STANDARD:STRING=11
             -DBUILD_OSG_APPLICATIONS:BOOL=OFF
             -DBUILD_OSG_EXAMPLES:BOOL=OFF
             -DBUILD_DOCUMENTATION:BOOL=OFF

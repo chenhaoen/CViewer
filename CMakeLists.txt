@@ -43,8 +43,18 @@ if(CVIEWER_SOURCES)
         PRIVATE
             include
     )
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${CVIEWER_GLFW_TARGET} OpenGL::GL ${CVIEWER_OSG_TARGET})
-    add_dependencies(${PROJECT_NAME} ${CVIEWER_GLFW_DEPENDENCY_TARGET} ${CVIEWER_OSG_DEPENDENCY_TARGET})
+    target_link_libraries(
+        ${PROJECT_NAME}
+        PRIVATE
+            ${CVIEWER_GLFW_TARGET}
+            OpenGL::GL
+            ${CVIEWER_OSG_TARGET}
+    )
+    add_dependencies(
+        ${PROJECT_NAME}
+        ${CVIEWER_GLFW_DEPENDENCY_TARGET}
+        ${CVIEWER_OSG_DEPENDENCY_TARGET}
+    )
 
     set(CVIEWER_SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/shader")
     if(EXISTS "${CVIEWER_SHADER_SOURCE_DIR}")
